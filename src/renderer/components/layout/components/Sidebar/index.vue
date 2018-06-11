@@ -20,6 +20,11 @@
           <span>入库</span>
         </el-menu-item>
       </router-link>
+      <router-link to="/summary">
+        <el-menu-item index="2" class="submenu-title-noDropdown">
+          <span>汇总</span>
+        </el-menu-item>
+      </router-link>
     </el-menu>
   </el-scrollbar>
 </template>

@@ -15,6 +15,9 @@ export default new Router({
       }, {
         path: '/in',
         component: require('@/components/in/In').default
+      }, {
+        path: '/summary',
+        component: require('@/components/summary/Summary').default
       }]
     },
     {

@@ -8,16 +8,38 @@
       label="商品编号">
     </el-table-column>
     <el-table-column
+      sortable
       prop="name"
       label="商品名称">
     </el-table-column>
     <el-table-column
+      sortable
       prop="type"
       label="规格型号">
     </el-table-column>
     <el-table-column
+      sortable
+      prop="provider"
+      label="供应商">
+    </el-table-column>
+    <el-table-column
+      sortable
+      prop="manufacturer"
+      label="厂商">
+    </el-table-column>
+    <el-table-column
       prop="number"
       label="数量">
+    </el-table-column>
+    <el-table-column
+      sortable
+      prop="expiryTime"
+      label="过期时间">
+    </el-table-column>
+    <el-table-column
+      sortable
+      prop="createTime"
+      label="入库时间">
     </el-table-column>
     <el-table-column
       label="操作">
@@ -29,6 +51,7 @@
 </template>
 
 <script>
+  import { format } from '../../utils'
   export default {
     data () {
       return {
@@ -43,7 +66,14 @@
     methods: {
       async getGoods () {
         const goods = await this.$db.goods.getAllGoods()
-        this.goods = goods
+
+        this.goods = goods.map(g => {
+          return {
+            ...g,
+            expiryTime: format(g.expiryTime),
+            createTime: format(g.createTime, 'YYYY-MM-DD h:mm:ss')
+          }
+        })
       },
 
       handleOutClick (row) {

@@ -1,25 +1,23 @@
-# stock-admin
-
-> An electron-vue project
-
-#### Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:9080
-npm run dev
-
-# build electron application for production
-npm run build
-
-
-# lint all JS/Vue component files in `src/`
-npm run lint
+# TODO
+* 重新设计数据结构
 
 ```
-
----
-
-This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[4c6ee7b](https://github.com/SimulatedGREG/electron-vue/tree/4c6ee7bf4f9b4aa647a22ec1c1ca29c2e59c3645) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
+{
+  name: 'ksajdgl',
+  type: 20*30,
+  number: 3,
+  in: [{
+    n: 2,
+    expiryTime: '2018-11-15',
+    createTime: '2018-11-14 23:12:12'
+  }, {
+    n: 2,
+    expiryTime: '2018-11-15',
+    createTime: '2018-11-14 23:12:29'
+  }],
+  out: [{
+    n: 1,
+    outTime: '2018-11-18 23:19:50'
+  }]
+}
+```

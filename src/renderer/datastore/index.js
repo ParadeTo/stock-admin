@@ -2,7 +2,6 @@
 import Datastore from 'nedb'
 import path from 'path'
 import { remote } from 'electron'
-console.log(remote.app.getPath('userData'))
 
 const db = {}
 db.goods = new Datastore({
@@ -11,9 +10,11 @@ db.goods = new Datastore({
 })
 
 // goods
-db.goods.getAllGoodsNameAndType = () => {
+db.goods.getFields = () => {
   const names = new Set()
   const types = new Set()
+  const providers = new Set()
+  const manufacturers = new Set()
   return new Promise((resolve, reject) => {
     db.goods.find({}, (err, goods) => {
       if (!err && goods && goods.length > 0) {
@@ -24,8 +25,14 @@ db.goods.getAllGoodsNameAndType = () => {
           if (g.type) {
             types.add(g.type)
           }
+          if (g.provider) {
+            providers.add(g.provider)
+          }
+          if (g.manufacturer) {
+            manufacturers.add(g.manufacturer)
+          }
         })
-        resolve({nameList: [...names], typeList: [...types]})
+        resolve({nameList: [...names], typeList: [...types], providerList: [...providers], manufacturerList: [...manufacturers]})
       } else {
         reject(err)
       }
@@ -35,7 +42,7 @@ db.goods.getAllGoodsNameAndType = () => {
 
 db.goods.getAllGoods = () => {
   return new Promise((resolve, reject) => {
-    db.goods.find({}, (err, goods) => {
+    db.goods.find({ show: 1 }, (err, goods) => {
       if (err) {
         reject(err)
         return
@@ -59,7 +66,7 @@ db.goods.stockOut = (_id, number) => {
 
 db.goods.removeItem = _id => {
   return new Promise((resolve, reject) => {
-    db.goods.remove({ _id }, {}, (err, goods) => {
+    db.goods.update({ _id }, { $set: { show: 0 } }, {}, (err, goods) => {
       if (err) {
         console.log(err)
         reject(err)
