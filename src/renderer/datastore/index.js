@@ -12,14 +12,23 @@ db.goods = new Datastore({
   filename: path.join(remote.app.getPath('userData'), '/goods.db')
 })
 
-db.goods.find({ 'out.outTime': { $lt: new Date().getTime() } }, (err, goods) => {
-  console.log(err)
-  console.log(goods)
+db.out = new Datastore({
+  autoload: true,
+  filename: path.join(remote.app.getPath('userData'), '/out.db')
 })
-db.goods.find({ createTime: { $lt: new Date().getTime() } }, (err, goods) => {
-  console.log(err)
-  console.log(goods)
-})
+
+// out
+db.out.insertOutRecord = ({goodsId, number}) => {
+  return new Promise((resolve, reject) => {
+    db.out.insert({goodsId, number, outTime: new Date()}, (err, res) => {
+      if (err) {
+        reject(err)
+        return
+      }
+      resolve(res)
+    })
+  })
+}
 
 // goods
 db.goods.getFields = () => {
@@ -68,14 +77,15 @@ db.goods.stockOut = (_id, number) => {
   number = +number
   return new Promise((resolve, reject) => {
     db.goods.update({ _id }, {
-      $inc: { number: -number },
-      $push: { out: { number, outTime: new Date() } }
+      $inc: { number: -number }
     },
-    {}, (err, goods) => {
+    {}, async (err, goods) => {
       if (err) {
         reject(err)
         return
       }
+      // insert out table
+      await db.out.insertOutRecord({goodsId: _id, number})
       resolve(goods)
     })
   })
@@ -113,7 +123,6 @@ out: {
 }
 **/
 db.goods.stockIn = data => {
-  data.out = []
   return new Promise((resolve, reject) => {
     db.goods.insert(data, (err, res) => {
       if (err) {

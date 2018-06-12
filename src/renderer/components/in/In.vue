@@ -105,7 +105,7 @@
         }
       },
       submitForm (formName) {
-        this.$refs[formName].validate((valid) => {
+        this.$refs[formName].validate(async (valid) => {
           if (valid) {
             const data = {
               ...this.ruleForm,
@@ -115,17 +115,16 @@
               createTime: new Date().getTime()
             }
 
-            this.$db.goods.insert(data, (err, res) => {
-              if (err) {
-                this.$message.error('入库失败')
-                return
-              }
+            try {
+              await this.$db.goods.stockIn(data)
               this.$message({
                 message: '入库成功',
                 type: 'success'
               })
-              window.location.reload()
-            })
+              this.resetForm('ruleForm')
+            } catch (err) {
+              this.$message.error('入库失败')
+            }
           } else {
             console.log('error submit!!')
             return false
