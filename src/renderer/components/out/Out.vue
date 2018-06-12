@@ -87,12 +87,12 @@
         }).then(async ({ value }) => {
           value = value > number ? number : value
 
-          if (number === Number(value)) {
-            console.log(1)
-            await this.$db.goods.removeItem(_id)
-          } else {
-            await this.$db.goods.stockOut(_id, value)
-          }
+          // if (number === Number(value)) {
+          //   console.log(1)
+          //   await this.$db.goods.removeItem(_id)
+          // } else {
+          await this.$db.goods.stockOut(_id, value)
+          // }
 
           this.$message({
             type: 'success',

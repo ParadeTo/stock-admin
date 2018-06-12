@@ -55,6 +55,8 @@
       return {
         nameList: [],
         typeList: [],
+        manufacturerList: [],
+        providerList: [],
         ruleForm: {
           code: '',
           name: '',
@@ -62,7 +64,8 @@
           provider: '',
           manufacturer: '',
           expiryTime: '',
-          number: 1
+          number: 1,
+          inStockNum: 1
         },
         rules: {
           code: [
@@ -87,10 +90,10 @@
     async created () {
       const res = await Vue.prototype.$db.goods.getFields()
       const { nameList, typeList, manufacturerList, providerList } = res
-      this.nameList = nameList
-      this.typeList = typeList
-      this.manufacturerList = manufacturerList
-      this.providerList = providerList
+      this.nameList = nameList || []
+      this.typeList = typeList || []
+      this.manufacturerList = manufacturerList || []
+      this.providerList = providerList || []
     },
 
     methods: {
@@ -106,11 +109,12 @@
           if (valid) {
             const data = {
               ...this.ruleForm,
+              inStockNum: this.ruleForm.number,
               show: 1,
               expiryTime: new Date().getTime(),
               createTime: new Date().getTime()
             }
-            debugger
+
             this.$db.goods.insert(data, (err, res) => {
               if (err) {
                 this.$message.error('入库失败')

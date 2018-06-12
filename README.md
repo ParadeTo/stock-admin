@@ -5,7 +5,6 @@
 {
   name: 'ksajdgl',
   type: 20*30,
-  number: 3,
   in: [{
     n: 2,
     expiryTime: '2018-11-15',

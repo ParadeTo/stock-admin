@@ -3,10 +3,22 @@ import Datastore from 'nedb'
 import path from 'path'
 import { remote } from 'electron'
 
+console.log(remote.app.getPath('userData'))
+
 const db = {}
+
 db.goods = new Datastore({
   autoload: true,
   filename: path.join(remote.app.getPath('userData'), '/goods.db')
+})
+
+db.goods.find({ 'out.outTime': { $lt: new Date().getTime() } }, (err, goods) => {
+  console.log(err)
+  console.log(goods)
+})
+db.goods.find({ createTime: { $lt: new Date().getTime() } }, (err, goods) => {
+  console.log(err)
+  console.log(goods)
 })
 
 // goods
@@ -53,8 +65,13 @@ db.goods.getAllGoods = () => {
 }
 
 db.goods.stockOut = (_id, number) => {
+  number = +number
   return new Promise((resolve, reject) => {
-    db.goods.update({ _id }, { $inc: { number: -number } }, {}, (err, goods) => {
+    db.goods.update({ _id }, {
+      $inc: { number: -number },
+      $push: { out: { number, outTime: new Date() } }
+    },
+    {}, (err, goods) => {
       if (err) {
         reject(err)
         return
@@ -64,15 +81,46 @@ db.goods.stockOut = (_id, number) => {
   })
 }
 
-db.goods.removeItem = _id => {
+// db.goods.removeItem = (_id, number) => {
+//   return new Promise((resolve, reject) => {
+//     db.goods.update({ _id }, { $set: { show: 0 }, $pu } }, {}, (err, goods) => {
+//       if (err) {
+//         console.log(err)
+//         reject(err)
+//         return
+//       }
+//       resolve(goods)
+//     })
+//   })
+// }
+
+db.goods.getItem = query => {
   return new Promise((resolve, reject) => {
-    db.goods.update({ _id }, { $set: { show: 0 } }, {}, (err, goods) => {
+    db.goods.find(query, (err, goods) => {
       if (err) {
-        console.log(err)
         reject(err)
         return
       }
       resolve(goods)
+    })
+  })
+}
+
+/**
+out: {
+  number: 1,
+  outTime: 2018-01-01 12:09:00
+}
+**/
+db.goods.stockIn = data => {
+  data.out = []
+  return new Promise((resolve, reject) => {
+    db.goods.insert(data, (err, res) => {
+      if (err) {
+        reject(err)
+        return
+      }
+      resolve(res)
     })
   })
 }
