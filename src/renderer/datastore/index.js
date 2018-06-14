@@ -20,7 +20,19 @@ db.out = new Datastore({
 // out
 db.out.insertOutRecord = ({goodsId, number}) => {
   return new Promise((resolve, reject) => {
-    db.out.insert({goodsId, number, outTime: new Date()}, (err, res) => {
+    db.out.insert({goodsId, number, outTime: new Date().getTime()}, (err, res) => {
+      if (err) {
+        reject(err)
+        return
+      }
+      resolve(res)
+    })
+  })
+}
+
+db.out.findByQuery = query => {
+  return new Promise((resolve, reject) => {
+    db.out.find(query, (err, res) => {
       if (err) {
         reject(err)
         return
@@ -91,20 +103,7 @@ db.goods.stockOut = (_id, number) => {
   })
 }
 
-// db.goods.removeItem = (_id, number) => {
-//   return new Promise((resolve, reject) => {
-//     db.goods.update({ _id }, { $set: { show: 0 }, $pu } }, {}, (err, goods) => {
-//       if (err) {
-//         console.log(err)
-//         reject(err)
-//         return
-//       }
-//       resolve(goods)
-//     })
-//   })
-// }
-
-db.goods.getItem = query => {
+db.goods.findByQuery = query => {
   return new Promise((resolve, reject) => {
     db.goods.find(query, (err, goods) => {
       if (err) {
@@ -116,12 +115,6 @@ db.goods.getItem = query => {
   })
 }
 
-/**
-out: {
-  number: 1,
-  outTime: 2018-01-01 12:09:00
-}
-**/
 db.goods.stockIn = data => {
   return new Promise((resolve, reject) => {
     db.goods.insert(data, (err, res) => {
@@ -133,5 +126,58 @@ db.goods.stockIn = data => {
     })
   })
 }
+
+db.summaryOutIn = async ({startTs, endTs}) => {
+  const outList = await db.out.findByQuery({ outTime: { $gte: startTs, $lte: endTs } })
+  const goodsList = await db.goods.findByQuery({ createTime: { $gte: startTs, $lte: endTs } })
+
+  const outMap = {}
+  const goodsMap = {}
+
+  outList.forEach(g => {
+    const { goodsId, number } = g
+    if (!outMap[goodsId]) {
+      outMap[goodsId] = number
+    } else {
+      outMap[goodsId] += number
+    }
+  })
+
+  goodsList.forEach(g => {
+    const { _id, name, inStockNum } = g
+    if (!goodsMap[_id]) {
+      goodsMap[_id] = {
+        name,
+        inStockNum,
+        outStockNum: outMap[_id] || 0
+      }
+    }
+  })
+
+  const summaryMap = {}
+  for (let k in goodsMap) {
+    const { name, inStockNum, outStockNum } = goodsMap[k]
+    if (!summaryMap[name]) {
+      summaryMap[name] = {
+        inStockNum,
+        outStockNum
+      }
+    } else {
+      summaryMap[name].inStockNum += inStockNum
+      summaryMap[name].outStockNum += outStockNum
+    }
+  }
+
+  return summaryMap
+}
+
+const startTs = new Date('2018-06-05').getTime()
+const endTs = new Date('2018-06-15').getTime()
+console.log(111)
+console.log(startTs, endTs)
+db.summaryOutIn({
+  startTs,
+  endTs
+})
 
 export default db

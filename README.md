@@ -4,7 +4,7 @@
 ```
 {
   name: 'ksajdgl',
-  type: 20*30,
+  type: '20*30',
   in: [{
     n: 2,
     expiryTime: '2018-11-15',

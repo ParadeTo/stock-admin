@@ -1,5 +1,10 @@
-export const format = (ts, format = 'DD-MM-YYYY') => {
-  const date = new Date(ts)
+import fs from 'fs'
+import os from 'os'
+import iconv from 'iconv-lite'
+
+// date: date obj or ts
+export const format = (date, format = 'DD-MM-YYYY') => {
+  date = new Date(date)
   var dateObj = {
     'M+': date.getMonth() + 1,
     'D+': date.getDate(),
@@ -19,4 +24,14 @@ export const format = (ts, format = 'DD-MM-YYYY') => {
     }
   }
   return format
+}
+
+export const writeSummaryOutIn = (filename, dataMap) => {
+  const EOL = os.EOL
+  let writeData = `商品名称,入库数量,出库数量${EOL}`
+  for (let k in dataMap) {
+    writeData += `${k},${dataMap[k].inStockNum},${dataMap[k].outStockNum}${EOL}`
+  }
+  writeData = iconv.encode(writeData, 'gbk')
+  fs.writeFileSync(filename, writeData)
 }
